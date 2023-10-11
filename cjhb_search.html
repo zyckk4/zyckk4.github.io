@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纯几何吧题号查题</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 50px;
+            color: #333;
+        }
+        input {
+            width: 200px;
+            padding: 5px 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        button {
+            margin-left: 10px;
+            padding: 6px 12px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>输入题号以查询帖子链接</h2>
+    <input type="number" id="indexInput" placeholder="输入题号">
+    <button id="searchButton">查找</button>
+    <p id="result"></p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('./cjhb.txt')
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error('Failed to fetch txt file');
+                    }
+                })
+                .then(content => {
+                    let lines = content.trim().split("\n");
+                    let dict = {};
+
+                    for (let i = 0; i < lines.length; i += 2) {
+                        let index = parseInt(lines[i].trim());
+                        let urls = lines[i + 1].trim().split(' ').filter(url => url !== ''); // 分割多个URL并移除空的项
+                        if (urls.length > 0) {
+                            dict[index] = urls;
+                        }
+                    }
+
+                    window.searchURL = function () {
+                        let index = parseInt(document.getElementById("indexInput").value);
+                        let resultElem = document.getElementById("result");
+
+                        if (isNaN(index) || index < 1) {
+                            resultElem.textContent = "输入错误，请输入一个正整数。";
+                            return;
+                        }
+
+                        let urls = dict[index];
+
+                        if (urls) {
+                            let links = urls.map(url => `<a href="${"https://tieba.baidu.com/p" + url}" target="_blank">${"https://tieba.baidu.com/p" + url}</a>`).join(', ');
+                            resultElem.innerHTML = `题号 ${index} 对应的链接是: ${links}`;
+                        } else {
+                            resultElem.textContent = `题号 ${index} 没有找到对应的链接。`;
+                        }
+                    }
+                    document.getElementById('searchButton').addEventListener('click', searchURL);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    </script>
+</body>
+
+</html>
