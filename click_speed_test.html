@@ -68,12 +68,19 @@
                 countdown = setInterval(updateTimer, 1000);
                 const clickArea = document.getElementById('clickArea');
                 clickArea.onclick = recordClick;
-                clickArea.ontouchstart = recordClick; // 触屏点击事件
+                clickArea.ontouchstart = recordTouch; // 触屏点击事件
                 clickArea.innerText = ''; // 隐藏按钮上的文字
             }
         }
 
         function recordClick() {
+            clickCount++;
+            updateClickCount();
+            calculateClickSpeed();
+        }
+
+        function recordTouch() {
+            document.getElementById('clickArea').onclick = null;
             clickCount++;
             updateClickCount();
             calculateClickSpeed();
